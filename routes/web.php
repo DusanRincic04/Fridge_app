@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use function Pest\Laravel\post;
@@ -21,8 +22,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('ingredients', [IngredientController::class, 'index'])->name('ingredients.index');
     Route::post('ingredients', [IngredientController::class, 'store'])->name('ingredients.store');
+    Route::get('ingredients/{ingredient}', [IngredientController::class, 'show'])->name('ingredients.show');
+    Route::get('ingredients/{ingredient}/edit', [IngredientController::class, 'edit'])->name('ingredients.edit');
+    Route::put('ingredients/{ingredient}', [IngredientController::class, 'update'])->name('ingredients.update');
+    Route::delete('ingredients/{ingredient}', [IngredientController::class, 'destroy'])->name('ingredients.destroy');
 
-    Route::get('listOfIngredients', [IngredientController::class, 'list'])->name('ingredients.list'); //da li praviti komtroler?
+    Route::get('recipes', [RecipeController::class, 'index'])->name('recipes.index');
+    Route::get('recipes/create', [RecipeController::class, 'create'])->name('recipes.create');
 });
 
 require __DIR__.'/auth.php';

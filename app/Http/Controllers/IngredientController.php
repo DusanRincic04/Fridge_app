@@ -10,27 +10,69 @@ class IngredientController extends Controller
 {
     public function index()
     {
-        return view('Ingredients');
+        $ingredients = Ingredient::all();
+        return view('ingredients', compact('ingredients'));
     }
 
-    public function create()
+
+    public function create(Request $request)
     {
 
     }
 
-    public function update(Request $request, Ingredient $ingredient)
+    public function show($id)
     {
+        $ingredient = Ingredient::find($id);
+        return view('IngredientShow', compact('ingredient'));
+    }
 
+    public function edit($id)
+    {
+        $ingredient = Ingredient::findOrFail($id);
+        ray($ingredient);
+        return view('IngredientEdit')->with('ingredient', $ingredient);
+    }
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $ingredient = Ingredient::findOrFail($id);
+
+        $ingredient->name = $request->input('name');
+        $ingredient->save();
+
+        return redirect()->route('ingredients.index');
     }
 
     public function store(Request $request)
     {
-        //Redirect::route('ListOfIngredients');
+        ray($request);
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+
+        $user = auth()->user(); // Trenutni korisnik
+
+        $ingredient = Ingredient::where('name', $request->name)->first();
+        if(!$ingredient) {
+            Ingredient::create([
+                'name' => $request->name,
+            ]);
+        }
+        ray($ingredient);
+        $user->ingredients()->attach($ingredient);
+
+        ray($request->name);
+        return redirect()->back();
     }
 
-    public function delete()
+    public function destroy($id)
     {
-
+        $ingredient = Ingredient::findOrFail($id);
+        $ingredient->delete();
+        return redirect()->route('ingredients.index');
     }
 
 
