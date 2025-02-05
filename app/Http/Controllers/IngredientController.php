@@ -32,6 +32,7 @@ class IngredientController extends Controller
         ray($ingredient);
         return view('IngredientEdit')->with('ingredient', $ingredient);
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -55,16 +56,17 @@ class IngredientController extends Controller
 
         $user = auth()->user(); // Trenutni korisnik
 
-        $ingredient = Ingredient::where('name', $request->name)->first();
-        if(!$ingredient) {
-            Ingredient::create([
-                'name' => $request->name,
-            ]);
-        }
+//        $ingredient = Ingredient::where('name', $request->name)->first();
+//        if(!$ingredient) {
+        $ingredient = Ingredient::create([
+            'name' => $request->name,
+
+        ]);
+            
         ray($ingredient);
         $user->ingredients()->attach($ingredient);
 
-        ray($request->name);
+        //ray($request->name);
         return redirect()->back();
     }
 

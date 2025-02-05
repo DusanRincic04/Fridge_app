@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class RecipeController extends Controller
 {
@@ -17,9 +18,26 @@ class RecipeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        //ovde treba da atachujem listu ingreients na recipe
+
+        $user = auth()->user();
+
+        $ingredients = $user->ingredients()->pluck('name')->toArray();
+
+        ray($ingredients);
+        $ingredientString = implode(',', $ingredients);
+
+        ray($ingredientString);
+
+        $response = Http::get("https://www.themealdb.com/api/json/v1/1/filter.php", [
+            'i' => $ingredientString
+        ]);
+
+        $recipes = $response->json();
+        return $recipes;
+        //return view('recipes.index', ['recipes' => $recipes['meals'] ?? []]);
     }
 
     /**
