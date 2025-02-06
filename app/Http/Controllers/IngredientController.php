@@ -62,7 +62,7 @@ class IngredientController extends Controller
             'name' => $request->name,
 
         ]);
-            
+
         ray($ingredient);
         $user->ingredients()->attach($ingredient);
 
