@@ -49,7 +49,7 @@ class IngredientController extends Controller
 
     public function store(Request $request)
     {
-        ray($request);
+        //ray($request);
         $request->validate([
             'name' => 'required|string',
         ]);
@@ -63,7 +63,8 @@ class IngredientController extends Controller
 
         ]);
 
-        ray($ingredient);
+
+        //ray($ingredient);
         $user->ingredients()->attach($ingredient);
 
         //ray($request->name);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ingredient;
+use App\Models\Recipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use OpenAI\Client;
@@ -32,8 +33,6 @@ class RecipeController extends Controller
         if (empty($ingredients)) {
             return response()->json(['error' => 'No ingredients found']);
         }
-
-
 
 
         //            'response_format' => [
@@ -74,11 +73,11 @@ class RecipeController extends Controller
                 Ingredients: [comma separated list of ingredients]
                 Instructions: [how to prepare the meal]
 
-                Please make sure the format is strictly followed, not include extra information and separate each recipe with the word 'RECIPE_SEPARATOR'.";
+                Please make sure the format is strictly followed, not include extra information'.";
 
 
         //ray($prompt);
-        $yourApiKey = getenv('OPENAI_API_KEY');
+        $yourApiKey = config('services.openai.api_key');
         $client = OpenAI::client($yourApiKey);
 
         $response = $client->chat()->create([
@@ -130,51 +129,78 @@ class RecipeController extends Controller
         ]);
 
         $recipesText = $response->choices[0]->message->content;
-        ray(json_decode($recipesText));
-
-        $recipeArray = explode('RECIPE_SEPARATOR', $recipesText);
-
-
-        $recipeList = [];
-        foreach ($recipeArray as $recipe) {
-            // Ako postoji barem jedan recept
-            if (trim($recipe)) {
-                $recipeParts = explode("\n", trim($recipe));
-                $name = '';
-                $ingredients = '';
-                $instructions = '';
-
-                // Parsiranje linija za svaki recept
-                foreach ($recipeParts as $line) {
-                    if (strpos($line, 'name:') === 0) {
-                        $name = substr($line, 5);  // Skidamo "name: " i ostavljamo samo ime
-                    } elseif (strpos($line, 'Ingredients:') === 0) {
-                        $ingredients = substr($line, 12);  // Skidamo "Ingredients: " i ostavljamo listu
-                    } elseif (strpos($line, 'Instructions:') === 0) {
-                        $instructions = substr($line, 13);  // Skidamo "Instructions: " i ostavljamo instrukcije
-                    }
-                }
-
-                // Dodavanje recepta u niz
-                $recipeList[] = [
-                    'name' => $name,
-                    'ingredients' => $ingredients,
-                    'instructions' => $instructions,
-                ];
-            }
-        }
-
-// Vraćanje odgovora kao JSON
-        //return response()->json(['recipes' => $recipeList]);
-        return view('RecipeIndex')->with('recipes', $recipeList);
+        //ray($recipesText);
+        $recipes = json_decode($recipesText, true);
+        //ray($recipes);
+        //ray(json_decode($recipesText));
+        //return response()->json(['recipes' => $recipesText]);
+        return view('RecipeIndex')->with('recipes', $recipes);
     }
+
+//        $recipeArray = explode('RECIPE_SEPARATOR', $recipesText);
+//
+//
+//        $recipeList = [];
+//        foreach ($recipeArray as $recipe) {
+//            // Ako postoji barem jedan recept
+//            if (trim($recipe)) {
+//                $recipeParts = explode("\n", trim($recipe));
+//                $name = '';
+//                $ingredients = '';
+//                $instructions = '';
+//
+//                // Parsiranje linija za svaki recept
+//                foreach ($recipeParts as $line) {
+//                    if (strpos($line, 'name:') === 0) {
+//                        $name = substr($line, 5);  // Skidamo "name: " i ostavljamo samo ime
+//                    } elseif (strpos($line, 'Ingredients:') === 0) {
+//                        $ingredients = substr($line, 12);  // Skidamo "Ingredients: " i ostavljamo listu
+//                    } elseif (strpos($line, 'Instructions:') === 0) {
+//                        $instructions = substr($line, 13);  // Skidamo "Instructions: " i ostavljamo instrukcije
+//                    }
+//                }
+//
+//                // Dodavanje recepta u niz
+//                $recipeList[] = [
+//                    'name' => $name,
+//                    'ingredients' => $ingredients,
+//                    'instructions' => $instructions,
+//                ];
+//            }
+//        }
+//
+//// Vraćanje odgovora kao JSON
+//        //return response()->json(['recipes' => $recipeList]);
+//        return view('RecipeIndex')->with('recipes', $recipeList);
+//    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        ray($request);
+        $user = auth()->user();
+        ray($request);
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'ingredients' => 'required|array',
+            'instructions' => 'required|string',
+        ]);
+
+        ray($validatedData);
+
+        $recipe = Recipe::create([
+            'name' => $request->name,
+            'ingredients' => $request->ingredients,
+            'instructions' => $request->instructions,
+        ]);
+
+       
+
+        $user->recipes()->syncWithoutDetaching([$recipe->id]);
+
+        return redirect('/ingredients')->with('success', 'Recipe created');
     }
 
     /**

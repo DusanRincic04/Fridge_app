@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('ingredients');
-            $table->string('description');
+            $table->text('instructions');
             $table->timestamps();
         });
     }
