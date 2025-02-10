@@ -17,7 +17,11 @@ class RecipeController extends Controller
      */
     public function index()
     {
-        //
+        $user = auth()->user();
+
+        $recipes = $user->recipes()->get();
+        //dd($recipes);
+        return view('recipesSaved')->with('recipes', $recipes);
     }
 
     /**
@@ -134,7 +138,7 @@ class RecipeController extends Controller
         //ray($recipes);
         //ray(json_decode($recipesText));
         //return response()->json(['recipes' => $recipesText]);
-        return view('RecipeIndex')->with('recipes', $recipes);
+        return view('RecipesGenerated')->with('recipes', $recipes);
     }
 
 //        $recipeArray = explode('RECIPE_SEPARATOR', $recipesText);
@@ -192,13 +196,27 @@ class RecipeController extends Controller
 
         $recipe = Recipe::create([
             'name' => $request->name,
-            'ingredients' => $request->ingredients,
+            'ingredients' => json_encode($request->ingredients),
             'instructions' => $request->instructions,
         ]);
 
-       
+        $user->recipes()->attach([$recipe->id]);
 
-        $user->recipes()->syncWithoutDetaching([$recipe->id]);
+        $userIngredientNames = $user->ingredients()->pluck('name')->toArray();
+        ray($userIngredientNames);
+
+        $matchingIngredients = array_filter($validatedData['ingredients'], function ($ingredientName) use ($userIngredientNames) {
+            return in_array($ingredientName, $userIngredientNames);
+        });
+
+        foreach ($matchingIngredients as $ingredientName) {
+            $ingredient = Ingredient::where('name', $ingredientName)->first();
+            if ($ingredient) {
+                $recipe->ingredients()->attach($ingredient->id);
+            }
+        }
+
+
 
         return redirect('/ingredients')->with('success', 'Recipe created');
     }
@@ -256,6 +274,13 @@ class RecipeController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $recipe = Recipe::findOrFail($id);
+        $recipe->delete();
+        return redirect('/ingredients')->with('success', 'Recipe Deleted');
+    }
+
+    public function search()
+    {
+
     }
 }

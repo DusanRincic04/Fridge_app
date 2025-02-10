@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdviceController;
+use App\Http\Controllers\DietaryAdviceController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ProfileController;
@@ -30,6 +32,12 @@ Route::middleware('auth')->group(function () {
     Route::get('recipes', [RecipeController::class, 'index'])->name('recipes.index');
     Route::get('recipes/create', [RecipeController::class, 'create'])->name('recipes.create');
     Route::post('recipes', [RecipeController::class, 'store'])->name('recipes.store');
+    Route::delete('recipes/{recipe}', [RecipeController::class, 'destroy'])->name('recipes.destroy');
+
+    Route::get('/dietary-advice', [DietaryAdviceController::class, 'showForm'])->name('dietary.advice.form');
+    Route::post('/dietary-advice', [DietaryAdviceController::class, 'getDietaryAdvice'])->name('dietary.advice');
+
+
 });
 
 require __DIR__.'/auth.php';

@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
+        <a href="{{route("recipes.index")}}" class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Saved Recipes') }}
+        </a>
+        <a href="{{route("dietary.advice.form")}}" class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Nutrition advice') }}
+        </a>
+{{--        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">--}}
+{{--            {{ __('Dashboard') }}--}}
+{{--        </h2>--}}
     </x-slot>
 
     <div class="py-12">

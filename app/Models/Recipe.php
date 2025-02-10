@@ -15,6 +15,10 @@ class Recipe extends Model
         'ingredients',
         'instructions',
     ];
+
+    protected $casts = [
+        'ingredients' => 'array',
+    ];
     public function ingredients(): BelongsToMany
     {
         return $this->belongsToMany(Ingredient::class);

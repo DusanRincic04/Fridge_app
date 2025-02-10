@@ -10,8 +10,9 @@ class IngredientController extends Controller
 {
     public function index()
     {
-        $ingredients = Ingredient::all();
-        return view('ingredients', compact('ingredients'));
+        $user = auth()->user();
+        $ingredients = $user->ingredients()->get();
+        return view('ingredients')->with('ingredients', $ingredients);
     }
 
 
