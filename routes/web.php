@@ -33,7 +33,11 @@ Route::middleware('auth')->group(function () {
     Route::get('recipes/create', [RecipeController::class, 'create'])->name('recipes.create');
     Route::post('recipes', [RecipeController::class, 'store'])->name('recipes.store');
     Route::delete('recipes/{recipe}', [RecipeController::class, 'destroy'])->name('recipes.destroy');
-
+    Route::post('recipes/generate', [RecipeController::class, 'generate'])->name('recipes.generate');
+    Route::get('/generated-recipes', function () {
+        $recipes = session('recipes', []);
+        return view('RecipesGeneratedPrompt', compact('recipes'));
+    })->name('generated.recipes');
     Route::get('/dietary-advice', [DietaryAdviceController::class, 'showForm'])->name('dietary.advice.form');
     Route::post('/dietary-advice', [DietaryAdviceController::class, 'getDietaryAdvice'])->name('dietary.advice');
 

@@ -1,25 +1,41 @@
 <!DOCTYPE html>
 <x-app-layout>
     <x-slot name="header">
-        <a href="{{route("recipes.index")}}" class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <a href="{{route("recipes.index")}}"
+           class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Saved Recipes') }}
         </a>
-        <a href="{{route("dietary.advice.form")}}" class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+        <a href="{{route("dietary.advice.form")}}"
+           class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Nutrition advice') }}
         </a>
-{{--        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">--}}
-{{--            {{ __('Dashboard') }}--}}
-{{--        </h2>--}}
+        {{--        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">--}}
+        {{--            {{ __('Dashboard') }}--}}
+        {{--        </h2>--}}
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action={{route('ingredients.store')}} >
-                    @csrf
-                    <button class="dark:text-gray-200 border-amber-400 pr-1.5" type="submit">Add ingredient</button>
-                    <input type="text" name="name" required placeholder="new Ingredient" class="border p-2 rounded"/>
-                </form>
+                <div class="p-4">
+                    <form method="POST" action="{{route('recipes.generate')}}">
+                        @csrf
+                        <button class="dark:text-gray-200 border-amber-400 pr-1.5" type="submit">Generate recipe
+                        </button>
+                        <input type="text" name="prompt" required placeholder="your prompt"
+                               class="border p-2 rounded w-full"/>
+                        <input type="text" name="email" required placeholder="send recipe to this mail"
+                               class="border p-2 rounded w-full"/>
+                    </form>
+                </div>
+                <div class="p-4">
+                    <form method="POST" action={{route('ingredients.store')}} >
+                        @csrf
+                        <button class="dark:text-gray-200 border-amber-400 pr-1.5" type="submit">Add ingredient</button>
+                        <input type="text" name="name" required placeholder="new Ingredient"
+                               class="border p-2 rounded"/>
+                    </form>
+                </div>
                 <h3 class="p-6 font-bold text-red-500 dark:text-red-800-100">
                     Ingredients list
                 </h3>

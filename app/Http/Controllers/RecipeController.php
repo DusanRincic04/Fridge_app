@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\GeneratedRecipes;
 use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use OpenAI\Client;
 use OpenAI;
 use function Pest\Laravel\withHeaders;
@@ -217,7 +219,6 @@ class RecipeController extends Controller
         }
 
 
-
         return redirect('/ingredients')->with('success', 'Recipe created');
     }
 
@@ -279,8 +280,99 @@ class RecipeController extends Controller
         return redirect('/ingredients')->with('success', 'Recipe Deleted');
     }
 
-    public function search()
+    public function generate(Request $request)
     {
+        $request->validate([
+            'prompt' => 'required|string',
+            'email' => 'required|string|email|max:255',
+        ]);
 
+        $prompt = $request->input('prompt');
+        $email = $request->input('email');
+
+        $yourApiKey = config('services.openai.api_key');
+        $client = OpenAI::client($yourApiKey);
+
+        $response = $client->chat()->create([
+            'model' => 'gpt-4o-mini',
+            'messages' => [
+                ['role' => 'system', 'content' => 'Ti si AI asistent koji generiše recepte na osnovu sastojaka korisnika.'],
+                ['role' => 'user', 'content' => $prompt],
+            ],
+            'functions' => [
+                [
+                    'name' => 'generateRecipes',
+                    'description' => 'Generiše 3 najbolja recepta na osnovu sastojaka korisnika.',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'recipes' => [
+                                'type' => 'array',
+                                'description' => 'Lista generisanih recepata',
+                                'items' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'name' => ['type' => 'string', 'description' => 'Recipe name'],
+                                        'ingredients' => ['type' => 'array', 'items' => ['type' => 'string']],
+                                        'instructions' => ['type' => 'string'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'required' => ['recipes'],
+                    ],
+                ],
+            ],
+            'function_call' => 'auto',
+        ]);
+
+        ray($response);
+        return $this->handleFunctionCall($response, $email);
     }
+
+
+    private function handleFunctionCall($response, $email)
+    {
+        $savedRecipes = [];
+        $functionCall = $response->choices[0]->message->functionCall ?? null;
+
+        if ($functionCall && $functionCall->name === 'generateRecipes') {
+//            $recipesData = json_decode($functionCall->arguments, true)['recipes'];
+            //$savedRecipes = [];
+
+
+
+            // Slanje recepata na email
+//            Mail::send(new GeneratedRecipes($savedRecipes), function ($message) use ($email) {
+//                $message->to($email)->subject('Vaši generisani recepti');
+//            });
+
+
+
+
+
+            return redirect()->route('generated.recipes')->with('recipes', $savedRecipes);
+        }
+
+        return redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
+    }
+
+    private function generateRecipes(string $functionArguments)
+    {
+        foreach ($recipesData as $recipeData) {
+            // pripremis podatke
+
+            $this->generateRecipes($name, $incredients, $instructions);
+
+            $recipe = Recipe::create([
+                'name' => $recipeData['name'],
+                'ingredients' => json_encode($recipeData['ingredients']),
+                'instructions' => $recipeData['instructions'],
+            ]);
+            $savedRecipes[] = $recipe;
+        }
+
+        Mail::to($email)->send(new GeneratedRecipes($savedRecipes));
+    }
+
 }
