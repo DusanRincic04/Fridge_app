@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GenerateRecipes;
 use App\Mail\GeneratedRecipes;
 use App\Models\Ingredient;
 use App\Models\Recipe;
@@ -280,7 +281,7 @@ class RecipeController extends Controller
         return redirect('/ingredients')->with('success', 'Recipe Deleted');
     }
 
-    public function generate(Request $request)
+    public function generate(Request $request, GenerateRecipes $generatedRecipes)
     {
         $request->validate([
             'prompt' => 'required|string',
@@ -325,54 +326,24 @@ class RecipeController extends Controller
             ],
             'function_call' => 'auto',
         ]);
-
-        ray($response);
-        return $this->handleFunctionCall($response, $email);
-    }
-
-
-    private function handleFunctionCall($response, $email)
-    {
-        $savedRecipes = [];
+        
+//        return $this->handleFunctionCall($response, $email);
         $functionCall = $response->choices[0]->message->functionCall ?? null;
 
-        if ($functionCall && $functionCall->name === 'generateRecipes') {
-//            $recipesData = json_decode($functionCall->arguments, true)['recipes'];
-            //$savedRecipes = [];
-
-
-
-            // Slanje recepata na email
-//            Mail::send(new GeneratedRecipes($savedRecipes), function ($message) use ($email) {
-//                $message->to($email)->subject('Vaši generisani recepti');
-//            });
-
-
-
-
-
-            return redirect()->route('generated.recipes')->with('recipes', $savedRecipes);
+        if (!$functionCall) {
+            redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
         }
 
-        return redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
-    }
+        $savedRecepes = match($functionCall->name) {
+            'generateRecipes' => $generatedRecipes->handle($functionCall->arguments, $email),
+            default => false
+        };
 
-    private function generateRecipes(string $functionArguments)
-    {
-        foreach ($recipesData as $recipeData) {
-            // pripremis podatke
-
-            $this->generateRecipes($name, $incredients, $instructions);
-
-            $recipe = Recipe::create([
-                'name' => $recipeData['name'],
-                'ingredients' => json_encode($recipeData['ingredients']),
-                'instructions' => $recipeData['instructions'],
-            ]);
-            $savedRecipes[] = $recipe;
+        if (!$savedRecepes) {
+            return redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
         }
 
-        Mail::to($email)->send(new GeneratedRecipes($savedRecipes));
+        return view('RecipesGeneratedPrompt', ['recipes' => $savedRecepes]);
     }
 
 }
