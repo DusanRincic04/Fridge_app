@@ -285,11 +285,10 @@ class RecipeController extends Controller
     {
         $request->validate([
             'prompt' => 'required|string',
-            'email' => 'required|string|email|max:255',
         ]);
 
         $prompt = $request->input('prompt');
-        $email = $request->input('email');
+        //$email = $request->input('email');
 
         $yourApiKey = config('services.openai.api_key');
         $client = OpenAI::client($yourApiKey);
@@ -297,16 +296,21 @@ class RecipeController extends Controller
         $response = $client->chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => [
-                ['role' => 'system', 'content' => 'Ti si AI asistent koji generiše recepte na osnovu sastojaka korisnika.'],
+                ['role' => 'system', 'content' => 'Ti si AI asistent koji generiše recepte na osnovu sastojaka korisnika i salje recepte na mail koji prosledim u promptu.'],
                 ['role' => 'user', 'content' => $prompt],
             ],
             'functions' => [
                 [
                     'name' => 'generateRecipes',
-                    'description' => 'Generiše 3 najbolja recepta na osnovu sastojaka korisnika.',
+                    'description' => 'Generiše 3 najbolja recepta na osnovu sastojaka korisnika i posalji na mail koji prosledim u promptu.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
+                            'email' => [
+                                'type' => 'string',
+                                'description' => 'Email adresa na koju ce biti poslati generisani recepti.Ako nije unesen mail, javi mi gresku, nemoj da generises neki drugi mail',
+                                'format'=> 'email',
+                            ],
                             'recipes' => [
                                 'type' => 'array',
                                 'description' => 'Lista generisanih recepata',
@@ -320,30 +324,34 @@ class RecipeController extends Controller
                                 ],
                             ],
                         ],
-                        'required' => ['recipes'],
-                    ],
+                        'required' => ['email','recipes'],
+                    ],        
+
                 ],
             ],
             'function_call' => 'auto',
         ]);
-        
+
 //        return $this->handleFunctionCall($response, $email);
         $functionCall = $response->choices[0]->message->functionCall ?? null;
+        ray($functionCall);
 
         if (!$functionCall) {
             redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
         }
 
-        $savedRecepes = match($functionCall->name) {
-            'generateRecipes' => $generatedRecipes->handle($functionCall->arguments, $email),
+        $savedRecipes = match($functionCall->name) {
+            'generateRecipes' => $generatedRecipes->handle($functionCall->arguments),
             default => false
         };
 
-        if (!$savedRecepes) {
+        ray($savedRecipes);
+
+        if (!$savedRecipes) {
             return redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
         }
 
-        return view('RecipesGeneratedPrompt', ['recipes' => $savedRecepes]);
+        return view('RecipesGeneratedPrompt', ['recipes' => $savedRecipes]);
     }
 
 }

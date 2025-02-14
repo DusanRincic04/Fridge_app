@@ -22,9 +22,7 @@
                         @csrf
                         <button class="dark:text-gray-200 border-amber-400 pr-1.5" type="submit">Generate recipe
                         </button>
-                        <input type="text" name="prompt" required placeholder="your prompt"
-                               class="border p-2 rounded w-full"/>
-                        <input type="text" name="email" required placeholder="send recipe to this mail"
+                        <input type="text" name="prompt" required placeholder="type ingredients and mail address"
                                class="border p-2 rounded w-full"/>
                     </form>
                 </div>
