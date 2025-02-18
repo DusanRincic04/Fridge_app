@@ -25,6 +25,10 @@
                         <input type="text" name="prompt" required placeholder="type ingredients and mail address"
                                class="border p-2 rounded w-full"/>
                     </form>
+                    @if(session('error'))
+                        <div class="alert alert-danger text-red-600 font-bold">{{ session('error') }}</div>
+                    @endif
+
                 </div>
                 <div class="p-4">
                     <form method="POST" action={{route('ingredients.store')}} >

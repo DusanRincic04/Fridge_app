@@ -296,20 +296,20 @@ class RecipeController extends Controller
         $response = $client->chat()->create([
             'model' => 'gpt-4o-mini',
             'messages' => [
-                ['role' => 'system', 'content' => 'Ti si AI asistent koji generiše recepte na osnovu sastojaka korisnika i salje recepte na mail koji prosledim u promptu.'],
+                ['role' => 'system', 'content' => 'Ti si AI asistent koji generiše recepte na osnovu sastojaka korisnika i salje recepte na mail koji prosledim u promptu, ako ne prosledim mail baci gresku.'],
                 ['role' => 'user', 'content' => $prompt],
             ],
             'functions' => [
                 [
                     'name' => 'generateRecipes',
-                    'description' => 'Generiše 3 najbolja recepta na osnovu sastojaka korisnika i posalji na mail koji prosledim u promptu.',
+                    'description' => 'Generiše 3 najbolja recepta na osnovu sastojaka korisnika i posalji na mail koji prosledim u promptu, ako ne prosledim mail baci gresku.',
                     'parameters' => [
                         'type' => 'object',
                         'properties' => [
                             'email' => [
                                 'type' => 'string',
                                 'description' => 'Email adresa na koju ce biti poslati generisani recepti.Ako nije unesen mail, javi mi gresku, nemoj da generises neki drugi mail',
-                                'format'=> 'email',
+                                'format' => 'email',
                             ],
                             'recipes' => [
                                 'type' => 'array',
@@ -324,23 +324,27 @@ class RecipeController extends Controller
                                 ],
                             ],
                         ],
-                        'required' => ['email','recipes'],
-                    ],        
+                        'required' => ['email', 'recipes'],
+                    ],
 
                 ],
             ],
             'function_call' => 'auto',
         ]);
 
+        dd($response);
 //        return $this->handleFunctionCall($response, $email);
         $functionCall = $response->choices[0]->message->functionCall ?? null;
+        $responseContent = $response->choices[0]->message->content ?? null;
+
         ray($functionCall);
 
         if (!$functionCall) {
-            redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
+            return redirect()->route('ingredients.index')->with('error', $responseContent);
+
         }
 
-        $savedRecipes = match($functionCall->name) {
+        $savedRecipes = match ($functionCall->name) {
             'generateRecipes' => $generatedRecipes->handle($functionCall->arguments),
             default => false
         };
