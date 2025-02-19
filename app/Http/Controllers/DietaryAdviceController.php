@@ -47,7 +47,7 @@ class DietaryAdviceController extends Controller
             'model' => 'gpt-4-turbo',
             'messages' => [
                 ['role' => 'system', 'content' => 'You are a professional dietitian.'],
-                ['role' => 'user', 'content' => "I want dietary advice based on my ingredients, allergies, and preferences."],
+                ['role' => 'user', 'content' => 'I want dietary advice based on my ingredients, allergies, and preferences.'],
             ],
             'functions' => [
                 [
@@ -91,19 +91,19 @@ class DietaryAdviceController extends Controller
             ],
         ]);
 
-        //dd($response);
+        // dd($response);
         // Proveravamo da li postoji odgovor iz funkcije
         if (isset($response->choices[0]->message->functionCall)) {
             $functionArgs = json_decode($response->choices[0]->message->functionCall->arguments, true);
 
             // Kreiramo odgovor simulirajući da je stigao iz funkcije
-            $dietaryAdvice = "Based on your ingredients: " . implode(", ", $functionArgs['ingredients']) .
-                ". Avoid these allergens: " . implode(", ", $functionArgs['allergies']) .
-                ". Your preferences: " . implode(", ", $functionArgs['preferences']) .
-                ". Your goal is: " . $functionArgs['goal'] . ". Here’s a suitable meal plan: Try making a healthy stir-fry with " .
-                $functionArgs['ingredients'][0] . " and " . $functionArgs['ingredients'][1] . " to meet your " . $functionArgs['goal'] . " goals.";
+            $dietaryAdvice = 'Based on your ingredients: '.implode(', ', $functionArgs['ingredients']).
+                '. Avoid these allergens: '.implode(', ', $functionArgs['allergies']).
+                '. Your preferences: '.implode(', ', $functionArgs['preferences']).
+                '. Your goal is: '.$functionArgs['goal'].'. Here’s a suitable meal plan: Try making a healthy stir-fry with '.
+                $functionArgs['ingredients'][0].' and '.$functionArgs['ingredients'][1].' to meet your '.$functionArgs['goal'].' goals.';
         } else {
-            $dietaryAdvice = "No dietary advice generated.";
+            $dietaryAdvice = 'No dietary advice generated.';
         }
 
         // Prikazivanje korisniku

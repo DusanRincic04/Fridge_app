@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -17,6 +16,7 @@ class GeneratedRecipes extends Mailable
      * Create a new message instance.
      */
     public $recipes;
+
     public function __construct($recipes)
     {
         $this->recipes = $recipes;
@@ -42,7 +42,6 @@ class GeneratedRecipes extends Mailable
             with: ['recipes' => $this->recipes]  // Proslediš generisane recepte
         );
     }
-
 
     /**
      * Get the attachments for the message.

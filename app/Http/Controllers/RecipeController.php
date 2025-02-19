@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\GenerateRecipeFromPrompt;
 use App\Actions\GenerateRecipes;
 use App\Mail\GeneratedRecipes;
 use App\Models\Ingredient;
@@ -281,81 +282,6 @@ class RecipeController extends Controller
         return redirect('/ingredients')->with('success', 'Recipe Deleted');
     }
 
-    public function generate(Request $request, GenerateRecipes $generatedRecipes)
-    {
-        $request->validate([
-            'prompt' => 'required|string',
-        ]);
 
-        $prompt = $request->input('prompt');
-        //$email = $request->input('email');
-
-        $yourApiKey = config('services.openai.api_key');
-        $client = OpenAI::client($yourApiKey);
-
-        $response = $client->chat()->create([
-            'model' => 'gpt-4o-mini',
-            'messages' => [
-                ['role' => 'system', 'content' => 'Ti si AI asistent koji generiše recepte na osnovu sastojaka korisnika i salje recepte na mail koji prosledim u promptu, ako ne prosledim mail baci gresku.'],
-                ['role' => 'user', 'content' => $prompt],
-            ],
-            'functions' => [
-                [
-                    'name' => 'generateRecipes',
-                    'description' => 'Generiše 3 najbolja recepta na osnovu sastojaka korisnika i posalji na mail koji prosledim u promptu, ako ne prosledim mail baci gresku.',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'email' => [
-                                'type' => 'string',
-                                'description' => 'Email adresa na koju ce biti poslati generisani recepti.Ako nije unesen mail, javi mi gresku, nemoj da generises neki drugi mail',
-                                'format' => 'email',
-                            ],
-                            'recipes' => [
-                                'type' => 'array',
-                                'description' => 'Lista generisanih recepata',
-                                'items' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'name' => ['type' => 'string', 'description' => 'Recipe name'],
-                                        'ingredients' => ['type' => 'array', 'items' => ['type' => 'string']],
-                                        'instructions' => ['type' => 'string'],
-                                    ],
-                                ],
-                            ],
-                        ],
-                        'required' => ['email', 'recipes'],
-                    ],
-
-                ],
-            ],
-            'function_call' => 'auto',
-        ]);
-
-        dd($response);
-//        return $this->handleFunctionCall($response, $email);
-        $functionCall = $response->choices[0]->message->functionCall ?? null;
-        $responseContent = $response->choices[0]->message->content ?? null;
-
-        ray($functionCall);
-
-        if (!$functionCall) {
-            return redirect()->route('ingredients.index')->with('error', $responseContent);
-
-        }
-
-        $savedRecipes = match ($functionCall->name) {
-            'generateRecipes' => $generatedRecipes->handle($functionCall->arguments),
-            default => false
-        };
-
-        ray($savedRecipes);
-
-        if (!$savedRecipes) {
-            return redirect()->route('generated.recipes')->with('error', 'Nije moguće generisati recepte.');
-        }
-
-        return view('RecipesGeneratedPrompt', ['recipes' => $savedRecipes]);
-    }
 
 }
