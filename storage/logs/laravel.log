@@ -13663,3 +13663,57 @@ Content-Transfer-Encoding: quoted-printable
 #28 C:\\Program Files\\Herd\\resources\\app.asar.unpacked\\resources\\valet\\server.php(139): require('C:\\\\Users\\\\mojme\\\\...')
 #29 {main}
 "} 
+[2025-02-20 12:06:53] local.ERROR: Command "pest:insta" is not defined.
+
+Did you mean one of these?
+    breeze:install
+    migrate:install
+    openai:install
+    pest:dataset
+    pest:test
+    sail:install
+    test {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"pest:insta\" is not defined.
+
+Did you mean one of these?
+    breeze:install
+    migrate:install
+    openai:install
+    pest:dataset
+    pest:test
+    sail:install
+    test at C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\symfony\\console\\Application.php:726)
+[stacktrace]
+#0 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\symfony\\console\\Application.php(284): Symfony\\Component\\Console\\Application->find('pest:insta')
+#1 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\symfony\\console\\Application.php(193): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#2 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(198): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1231): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\artisan(13): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#5 {main}
+"} 
+[2025-02-20 12:07:00] local.ERROR: Command "pest:install" is not defined.
+
+Did you mean one of these?
+    breeze:install
+    migrate:install
+    openai:install
+    pest:dataset
+    pest:test
+    sail:install
+    test {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"pest:install\" is not defined.
+
+Did you mean one of these?
+    breeze:install
+    migrate:install
+    openai:install
+    pest:dataset
+    pest:test
+    sail:install
+    test at C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\symfony\\console\\Application.php:726)
+[stacktrace]
+#0 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\symfony\\console\\Application.php(284): Symfony\\Component\\Console\\Application->find('pest:install')
+#1 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\symfony\\console\\Application.php(193): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#2 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Console\\Kernel.php(198): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1231): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 C:\\Users\\mojme\\Documents\\GitHub\\Fridge_app\\artisan(13): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#5 {main}
+"} 

@@ -43,7 +43,9 @@ class RecipeFromPromptController extends Controller
         ray($savedRecipes);
 
         if (! $savedRecipes) {
-            return redirect()->route('generated.recipes')->with('error', 'Recipes cant be generated.');
+            return redirect()
+                ->route('generated.recipes')->with('error', 'Recipes cant be generated.');
+
         }
 
         return view('RecipesGeneratedPrompt', ['recipes' => $savedRecipes]);
