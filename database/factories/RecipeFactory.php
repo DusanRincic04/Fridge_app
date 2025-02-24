@@ -12,7 +12,9 @@ class RecipeFactory extends Factory
     public function definition(): array
     {
         return [
-
+            'name' => $this->faker->name(),
+            'ingredients' => $this->faker->text(),
+            'instructions' => $this->faker->text(),
         ];
     }
 }
