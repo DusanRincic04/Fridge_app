@@ -37,6 +37,7 @@ it('ingredient can be edited', function () {
     $this->actingAs($user);
 
     $ingredient = Ingredient::factory()->create();
+
     $newName = 'Updated ingredient';
 
     $response = $this->put(route('ingredients.update', $ingredient->id), [

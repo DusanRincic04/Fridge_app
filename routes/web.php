@@ -1,13 +1,11 @@
 <?php
 
-use App\Http\Controllers\AdviceController;
 use App\Http\Controllers\DietaryAdviceController;
 use App\Http\Controllers\IngredientController;
-use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\RecipeFromPromptController;
 use Illuminate\Support\Facades\Route;
-use function Pest\Laravel\post;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,7 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 
     Route::get('ingredients', [IngredientController::class, 'index'])->name('ingredients.index');
     Route::post('ingredients', [IngredientController::class, 'store'])->name('ingredients.store');
@@ -39,7 +36,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/generated-recipes_prompt', [RecipeFromPromptController::class, 'index'])->name('recipes_prompt.index');
     Route::get('/dietary-advice', [DietaryAdviceController::class, 'showForm'])->name('dietary.advice.form');
     Route::post('/dietary-advice', [DietaryAdviceController::class, 'getDietaryAdvice'])->name('dietary.advice');
-
 
 });
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Ingredient;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 
 class IngredientController extends Controller
 {
@@ -12,18 +11,14 @@ class IngredientController extends Controller
     {
         $user = auth()->user();
         $ingredients = $user->ingredients()->get();
+
         return view('ingredients')->with('ingredients', $ingredients);
-    }
-
-
-    public function create(Request $request)
-    {
-
     }
 
     public function show($id)
     {
         $ingredient = Ingredient::find($id);
+
         return view('IngredientShow', compact('ingredient'));
     }
 
@@ -31,6 +26,7 @@ class IngredientController extends Controller
     {
         $ingredient = Ingredient::findOrFail($id);
         ray($ingredient);
+
         return view('IngredientEdit')->with('ingredient', $ingredient);
     }
 
@@ -50,34 +46,34 @@ class IngredientController extends Controller
 
     public function store(Request $request)
     {
-        //ray($request);
+        // ray($request);
         $request->validate([
             'name' => 'required|string',
         ]);
 
         $user = auth()->user(); // Trenutni korisnik
 
-//        $ingredient = Ingredient::where('name', $request->name)->first();
-//        if(!$ingredient) {
+        //        $ingredient = Ingredient::where('name', $request->name)->first();
+        //        if(!$ingredient) {
         $ingredient = Ingredient::create([
             'name' => $request->name,
 
         ]);
 
-
-        //ray($ingredient);
+        // ray($ingredient);
         $user->ingredients()->attach($ingredient);
 
-        //ray($request->name);
+        // ray($request->name);
         return redirect()->back();
     }
+
+    public function create(Request $request) {}
 
     public function destroy($id)
     {
         $ingredient = Ingredient::findOrFail($id);
         $ingredient->delete();
+
         return redirect()->route('ingredients.index');
     }
-
-
 }
