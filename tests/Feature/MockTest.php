@@ -1,58 +1,62 @@
 <?php
 
+namespace Tests\Feature;
+
+use App\Models\Ingredient;
 use App\Models\User;
-use OpenAI\Laravel\Facades\OpenAI;
-use OpenAI\Resources\Chat;
+use OpenAI\Contracts\ClientContract;
 use OpenAI\Responses\Chat\CreateResponse;
+use OpenAI\Testing\ClientFake;
 
 it('can generate recipes using a mocked OpenAI client', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $user->ingredients()->create(['name' => 'Tomato']);
-    $user->ingredients()->create(['name' => 'Banana']);
+    $ingredients = Ingredient::factory()->count(3)->create();
+    $user->ingredients()->attach($ingredients);
 
-    // OpenAI Fake sa očekivanim odgovorom
-    OpenAI::fake([
-        CreateResponse::fake([
-            'choices' => [
-                [
-                    'message' => [
-                        'content' => json_encode([
-                            'recipes' => [
-                                [
-                                    'name' => 'Tomato Pasta',
-                                    'ingredients' => ['Tomato', 'Garlic', 'Pasta'],
-                                    'instructions' => 'Boil pasta. Add sauce. Serve hot.',
+    app()->bind(ClientContract::class, function () {
+        $client = new ClientFake([
+            CreateResponse::fake([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => json_encode([
+                                'recipes' => [
+                                    [
+                                        'name' => 'Pasta Carbonara',
+                                        'ingredients' => ['Pasta', 'Eggs', 'Bacon', 'Parmesan'],
+                                        'instructions' => 'Cook pasta, mix with eggs and bacon, serve with Parmesan.',
+                                    ],
+                                    [
+                                        'name' => 'Tomato Soup',
+                                        'ingredients' => ['Tomatoes', 'Onion', 'Garlic'],
+                                        'instructions' => 'Blend tomatoes, cook with onion and garlic.',
+                                    ],
+                                    [
+                                        'name' => 'Grilled Chicken Salad',
+                                        'ingredients' => ['Chicken', 'Lettuce', 'Olive Oil'],
+                                        'instructions' => 'Grill chicken, mix with lettuce and olive oil.',
+                                    ],
                                 ],
-                            ],
-                        ]),
+                            ]),
+                        ],
                     ],
                 ],
-            ],
-        ]),
-    ]);
+            ]),
+        ]);
 
-    // Pozivanje endpointa koji koristi OpenAI API
-    $response = $this->postJson('/recipes', [
-        'name' => 'Pasta',
-        'ingredients' => ['Tomato', 'Garlic'],
-        'instructions' => 'Boil pasta and add sauce.',
-    ]);
+        return $client;
+    });
+
+    $response = $this->get(route('recipes.create'));
     ray($response);
 
-    // Provera HTTP statusa i redirekcije
-    $response->assertStatus(302);
-    $response->assertRedirect('/ingredients');
-    $this->assertEquals(session('success'), 'Recipe created');
+    $response->assertStatus(200);
+    $response->assertViewIs('RecipesGenerated');
 
-    $response->assertStatus(302);
-    $response->assertRedirect('/ingredients');
-    $this->assertEquals(session('success'), 'Recipe created');
-
-    // Proveri da li je chat()->create() pozvan sa očekivanim parametrima
-    OpenAI::assertSent(Chat::class, function (string $method, array $parameters) {
-        return $method === 'create' &&
-            str_contains($parameters['messages'][1]['content'], 'Tomato');
+    $response->assertViewHas('recipes', function ($recipes) {
+        return count($recipes['recipes']) === 3
+            && $recipes['recipes'][1]['name'] === 'Tomato Soup';
     });
 });

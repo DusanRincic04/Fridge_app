@@ -6,7 +6,6 @@ use App\Models\Ingredient;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
 use OpenAI;
-use OpenAI\Client;
 
 class RecipeController extends Controller
 {
@@ -104,7 +103,7 @@ class RecipeController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request, Client $client)
+    public function create(Request $request, OpenAI\Contracts\ClientContract $client)
     {
         $user = auth()->user();
 
@@ -134,7 +133,7 @@ class RecipeController extends Controller
         //                                'description' => 'provide the array of all ingredients',
         //                                'items' => [
         //                                    'type' => 'string',
-        //                                ]
+        //                                ].
         //                            ],
         //                        ],
         //                        'required' => ['name', 'instructions', 'ingredients'],
@@ -155,8 +154,7 @@ class RecipeController extends Controller
                 Please make sure the format is strictly followed, not include extra information'.";
 
         // ray($prompt);
-        $yourApiKey = config('services.openai.api_key');
-        $client = OpenAI::client($yourApiKey);
+        //        $yourApiKey = config('services.openai.api_key');
 
         $response = $client->chat()->create([
             'model' => 'gpt-4o-mini',
@@ -207,6 +205,7 @@ class RecipeController extends Controller
         ]);
 
         $recipesText = $response->choices[0]->message->content;
+
         // ray($recipesText);
         $recipes = json_decode($recipesText, true);
 
