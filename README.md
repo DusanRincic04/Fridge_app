@@ -51,10 +51,9 @@ Focus is on **backend functionality**: clean CRUD for ingredients & recipes, Ope
    - Open a generated recipe → **Read Recipe** (voice), **Edit** text, or **Delete** if not needed.
 
 ---
-
 ## 🚀 Quick Start
 
-bash
+```bash
 git clone https://github.com/DusanRincic04/Fridge_app.git
 cd Fridge_app
 
@@ -71,9 +70,10 @@ npm run dev   # dev build; use `npm run build` for prod
 
 # Run the app
 php artisan serve
+```
 
 ---
 
-## License
+## 📄 License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License – see the [LICENSE](LICENSE) file for details.
