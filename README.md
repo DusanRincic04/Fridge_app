@@ -54,7 +54,7 @@ Focus is on **backend functionality**: clean CRUD for ingredients & recipes, Ope
 
 ## 🚀 Quick Start
 
-```bash
+bash
 git clone https://github.com/DusanRincic04/Fridge_app.git
 cd Fridge_app
 
@@ -71,6 +71,8 @@ npm run dev   # dev build; use `npm run build` for prod
 
 # Run the app
 php artisan serve
+
+---
 
 ## License
 
